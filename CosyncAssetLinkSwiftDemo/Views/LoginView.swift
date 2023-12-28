@@ -24,6 +24,12 @@ struct LoginView: View {
                 .padding([.top], 10)
             Spacer()
             
+            Text("LOG IN")
+                .font(.system(size: 24, weight: .bold, design: .default))
+                .foregroundColor(Color.blue)
+            
+            Spacer()
+            
             TextField(
                 "Enter email",
                 text: $email

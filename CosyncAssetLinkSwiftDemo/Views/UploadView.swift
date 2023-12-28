@@ -144,9 +144,8 @@ struct UploadView: View {
             uploadStatus = "Creating Cosync Asset"
             break
             
-        case .transactionEnd(let _assets, _):
-            uploadStatus = "The upload is completed"
-            ToastManager.shared.send(title:"Upload Success", message: "Your asset has been uploaded.", type: "success")
+        case .transactionEnd(_, _):
+            uploadStatus = "Your asset has been uploaded."
             isUploading = false
             self.uploads = []
             break

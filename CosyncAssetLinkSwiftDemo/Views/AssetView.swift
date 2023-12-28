@@ -12,17 +12,19 @@ import CosyncAssetLinkSwift
 
 struct AssetView: View { 
  
-    @ObservedResults(CosyncAsset.self, sortDescriptor: SortDescriptor(keyPath: "createdAt", ascending: false)) var assetList
+    @ObservedResults(CosyncAsset.self, where: {($0.userId == RM.user!.id)}, sortDescriptor: SortDescriptor(keyPath: "createdAt", ascending: false)) var assetList
     
     var body: some View {
         VStack{
         
             Text("Cosync Asset")
+            
+            if assetList.count == 0 {
+                Text("There is no Cosync Asset")
+            }
        
-            List{
-                ForEach(assetList, id: \.self){ asset in
-                   AssetRow(asset: asset)
-                }
+            List(assetList, id: \._id) { asset in
+               AssetRow(asset: asset) 
             }
         }
     }

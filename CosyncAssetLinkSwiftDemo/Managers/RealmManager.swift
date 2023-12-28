@@ -39,6 +39,29 @@ class RealmManager {
     }
     
     @MainActor
+    func signup(email:String, password:String) async throws -> Void{
+        
+        let client = app.emailPasswordAuth
+        
+        do {
+            try await client.registerUser(email: email, password: password)
+            // Registering just registers. You can now log in.
+            print("Successfully registered user.")
+            
+            let user = try await app.login(credentials: Credentials.emailPassword(email: email, password: password))
+            print("Successfully logged in userId: \(user.id)")
+            
+            try await initRealm()
+            
+            
+        } catch {
+            print("Failed to register: \(error.localizedDescription)")
+            throw(error)
+        }
+        
+    }
+    
+    @MainActor
     func logout(onCompletion completion: @escaping (Error?) -> Void) {
         
         if let user = app.currentUser {
