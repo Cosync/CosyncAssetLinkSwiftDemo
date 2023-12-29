@@ -2,13 +2,31 @@
 //  UploadView.swift
 //  CosyncAssetLinkSwiftDemo
 //
+//  Licensed to the Apache Software Foundation (ASF) under one
+//  or more contributor license agreements.  See the NOTICE file
+//  distributed with this work for additional information
+//  regarding copyright ownership.  The ASF licenses this file
+//  to you under the Apache License, Version 2.0 (the
+//  "License"); you may not use this file except in compliance
+//  with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing,
+//  software distributed under the License is distributed on an
+//  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+//  KIND, either express or implied.  See the License for the
+//  specific language governing permissions and limitations
+//  under the License.
+//
 //  Created by Tola Voeung on 27/12/23.
 //
 
 import SwiftUI
 import CosyncAssetLinkSwift
 import RealmSwift
-
+import AVKit
+ 
 struct UploadView: View {
     @State private var expiredHour: Double = 0.0
     @State private var showPicker: Bool = false
@@ -24,6 +42,7 @@ struct UploadView: View {
     var uploadManager = CSUploadManager.shared
     @State private var uploads: [CSUploadItem]  = []
     
+   
     var body: some View {
         VStack{
             Text("Tap on image to choose an image")
@@ -38,6 +57,12 @@ struct UploadView: View {
                         .frame(width:250, height:250)
                         .shadow(radius: 10)
                         .cornerRadius(10)
+                }
+                else if let vidoeUrl = selectedVideoUrl {
+                    VideoPlayer(player: AVPlayer(url:  vidoeUrl)) 
+                    .frame(width: 250, height: 250, alignment: .center)
+                    .shadow(radius: 10)
+                    .cornerRadius(10)
                 }
                 else {
                     Image(uiImage: UIImage(systemName: "photo")!)
@@ -63,6 +88,7 @@ struct UploadView: View {
                 }
                 
                 do {
+                    uploadingAmount = 0.0
                     isUploading = true
                     try uploadManager.uploadAssets(uploadItems: uploads) { (state: CSUploadState) in
                         onUpload(state)
@@ -81,20 +107,23 @@ struct UploadView: View {
                     .foregroundColor(Color.white)
                     .background(Color.blue)
                     .cornerRadius(10)
-            })
-            
-            
-                
+            }) 
             
         }
         .padding()
         .fullScreenCover(isPresented: $showPicker, onDismiss: {showPicker = false}) {
             AssetPicker(pickerResult: self.$pickerResult, selectedImage: self.$selectedImage ,selectedVideoUrl: self.$selectedVideoUrl, selectedType: self.$selectedType, isPresented: self.$showPicker, errorMessage: self.$selectedImageErrorMessage, preferredType : self.preferredType, isMultipleSelection: false)
         }
-        .onChange(of: selectedImage) {
+        .onChange(of: selectedImage) { _ in
+        //.onChange(of: selectedImage) { // ios 17 up
+            uploadStatus = ""
+            uploadingAmount = 0.0
             self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: URL.str(pickerResult[0])!, mediaType: CSUploadItem.MediaType.image, expiration:expiredHour)]
         }
-        .onChange(of: selectedVideoUrl) { _, url in
+        .onChange(of: selectedVideoUrl) { url in
+        //.onChange(of: selectedVideoUrl) { _, url in // ios 17 up
+            uploadStatus = ""
+            uploadingAmount = 0.0
             if let url = url {
                 self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: url, mediaType: CSUploadItem.MediaType.video, expiration:expiredHour)]
             }
