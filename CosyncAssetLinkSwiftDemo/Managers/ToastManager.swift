@@ -50,8 +50,11 @@ class ToastManager: ObservableObject {
     }
     
     func send (title:String, message:String, data:String = "", type:String = "error"){
-        notification = ToastDataModel(title: title, message: message, data: data, type: type)
-        notificationList.append(notification)
+        DispatchQueue.main.async {
+            
+            self.notification = ToastDataModel(title: title, message: message, data: data, type: type)
+            self.notificationList.append(self.notification)
+        }
         
     }
     

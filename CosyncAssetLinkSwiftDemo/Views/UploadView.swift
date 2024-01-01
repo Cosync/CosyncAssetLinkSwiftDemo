@@ -26,6 +26,7 @@ import SwiftUI
 import CosyncAssetLinkSwift
 import RealmSwift
 import AVKit
+import Photos
  
 struct UploadView: View {
     @State private var expiredHour: Double = 0.0
@@ -48,7 +49,7 @@ struct UploadView: View {
             Text("Tap on image to choose an image")
             Button(action: {
                 preferredType = ""
-                showPicker = true
+                checkPhotoAccess()
             }, label: {
                 if let image = selectedImage {
                     Image(uiImage: image)
@@ -65,7 +66,8 @@ struct UploadView: View {
                     .cornerRadius(10)
                 }
                 else {
-                    Image(uiImage: UIImage(systemName: "photo")!)
+                   
+                    Image("CosyncLogo")
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 250, height: 250)
@@ -73,32 +75,19 @@ struct UploadView: View {
                         .cornerRadius(10)
                 }
             })
-            
-            Text("\(uploadStatus)").padding()
+            if selectedImageErrorMessage != nil {
+                Text("\(selectedImageErrorMessage ?? "")").foregroundColor(.red)
+            }
+            else {
+                Text("\(uploadStatus)").padding()
+            }
             
             if isUploading {
                 ProgressView(("Uploading \( (uploadingAmount/1) * 100, specifier: "%.0f")%") , value: uploadingAmount, total: 1)
             }
             
             Button(action: {
-                
-                if uploads.count == 0 || isUploading {
-                    ToastManager.shared.send(title:"Upload Error", message: "Please choose an image.")
-                    return
-                }
-                
-                do {
-                    uploadingAmount = 0.0
-                    isUploading = true
-                    try uploadManager.uploadAssets(uploadItems: uploads) { (state: CSUploadState) in
-                        onUpload(state)
-                    }
-                }
-                catch {
-                    isUploading = false
-                    ToastManager.shared.send(title:"Upload Error", message: "Unable to upload asset.")
-                }
-                
+                uploadPhoto()
                 
             }, label: {
                 Text("Upload")
@@ -117,17 +106,78 @@ struct UploadView: View {
         .onChange(of: selectedImage) { _ in
         //.onChange(of: selectedImage) { // ios 17 up
             uploadStatus = ""
+            selectedImageErrorMessage = nil
             uploadingAmount = 0.0
             self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: URL.str(pickerResult[0])!, mediaType: CSUploadItem.MediaType.image, expiration:expiredHour)]
         }
         .onChange(of: selectedVideoUrl) { url in
         //.onChange(of: selectedVideoUrl) { _, url in // ios 17 up
             uploadStatus = ""
+            selectedImageErrorMessage = nil
             uploadingAmount = 0.0
             if let url = url {
                 self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: url, mediaType: CSUploadItem.MediaType.video, expiration:expiredHour)]
             }
         }
+    }
+    
+    
+    @MainActor private func uploadPhoto(){
+        if uploads.count == 0 || isUploading {
+            ToastManager.shared.send(title:"Upload Error", message: "Please choose an image.")
+            return
+        }
+        
+        do {
+            uploadingAmount = 0.0
+            isUploading = true
+            try uploadManager.uploadAssets(uploadItems: uploads) { (state: CSUploadState) in
+                onUpload(state)
+            }
+        }
+        catch {
+            isUploading = false
+            ToastManager.shared.send(title:"Upload Error", message: "Unable to upload asset.")
+        }
+    }
+    
+    
+    private func checkPhotoAccess(){
+        let readWriteStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        if readWriteStatus != PHAuthorizationStatus.authorized {
+            // Request read-write access to the user's photo library.
+            
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+                switch status {
+                case .notDetermined:
+                    // The user hasn't determined this app's access.
+                    break
+                case .restricted:
+                    // The system restricted this app's access.
+                    break
+                case .denied:
+                    // The user explicitly denied this app's access.
+                    ToastManager.shared.send(title:"Upload Error", message: "Please allow app to access your photo library in your iPhone privacy setting")
+                    break
+                case .authorized:
+                    // The user authorized this app to access Photos data.
+                    showPicker = true
+                    
+                    break
+                case .limited:
+                    // The user authorized this app for limited Photos access.
+                    ToastManager.shared.send(title:"Upload Error", message: "Unable to fully access all images.")
+                    break
+                @unknown default:
+                    ToastManager.shared.send(title:"Upload Error", message: "Unable to access to any image.")
+                    fatalError()
+                }
+            }
+        }
+        else {
+            showPicker = true
+        }
+        
     }
     
     @MainActor func uploadImage(){

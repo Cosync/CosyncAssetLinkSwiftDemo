@@ -98,6 +98,8 @@ struct LoginView: View {
                 self.appState.loading = false
             }
             catch {
+                self.appState.loading = false
+                ToastManager.shared.send(title:"Invalid Data", message:"\(error.localizedDescription)")
                 print("You got an error \(error.localizedDescription)")
             }
         }

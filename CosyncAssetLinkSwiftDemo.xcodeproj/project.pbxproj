@@ -27,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		52BD787E2B400E2400911EED /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		52E68D762B3BBCE90085E771 /* CosyncAssetLinkSwiftDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CosyncAssetLinkSwiftDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52E68D792B3BBCE90085E771 /* CosyncAssetLinkSwiftDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosyncAssetLinkSwiftDemoApp.swift; sourceTree = "<group>"; };
 		52E68D7B2B3BBCE90085E771 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -77,6 +78,7 @@
 		52E68D782B3BBCE90085E771 /* CosyncAssetLinkSwiftDemo */ = {
 			isa = PBXGroup;
 			children = (
+				52BD787E2B400E2400911EED /* Info.plist */,
 				52E68D932B3BBECE0085E771 /* Managers */,
 				52E68D8A2B3BBE7C0085E771 /* Views */,
 				52E68D792B3BBCE90085E771 /* CosyncAssetLinkSwiftDemoApp.swift */,
@@ -347,6 +349,7 @@
 				DEVELOPMENT_TEAM = WQQLK89MX8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CosyncAssetLinkSwiftDemo/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Allow app to access your photo to upload";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -377,6 +380,7 @@
 				DEVELOPMENT_TEAM = WQQLK89MX8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CosyncAssetLinkSwiftDemo/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Allow app to access your photo to upload";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
