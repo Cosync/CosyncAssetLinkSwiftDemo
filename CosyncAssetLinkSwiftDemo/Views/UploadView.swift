@@ -46,11 +46,7 @@ struct UploadView: View {
    
     var body: some View {
         VStack{
-            Text("Tap on image to choose an image")
-            Button(action: {
-                preferredType = ""
-                checkPhotoAccess()
-            }, label: {
+            ZStack{
                 if let image = selectedImage {
                     Image(uiImage: image)
                         .resizable()
@@ -60,7 +56,7 @@ struct UploadView: View {
                         .cornerRadius(10)
                 }
                 else if let vidoeUrl = selectedVideoUrl {
-                    VideoPlayer(player: AVPlayer(url:  vidoeUrl)) 
+                    VideoPlayer(player: AVPlayer(url:  vidoeUrl))
                     .frame(width: 250, height: 250, alignment: .center)
                     .shadow(radius: 10)
                     .cornerRadius(10)
@@ -74,7 +70,23 @@ struct UploadView: View {
                         .shadow(radius: 10)
                         .cornerRadius(10)
                 }
+                
+                
+            }
+            
+            Button(action: {
+                preferredType = ""
+                checkPhotoAccess()
+            }, label: {
+                Text("choose image/video")
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.blue)
+                    .cornerRadius(12)
+               
             })
+            
+            
             if selectedImageErrorMessage != nil {
                 Text("\(selectedImageErrorMessage ?? "")").foregroundColor(.red)
             }
@@ -103,20 +115,26 @@ struct UploadView: View {
         .fullScreenCover(isPresented: $showPicker, onDismiss: {showPicker = false}) {
             AssetPicker(pickerResult: self.$pickerResult, selectedImage: self.$selectedImage ,selectedVideoUrl: self.$selectedVideoUrl, selectedType: self.$selectedType, isPresented: self.$showPicker, errorMessage: self.$selectedImageErrorMessage, preferredType : self.preferredType, isMultipleSelection: false)
         }
-        .onChange(of: selectedImage) { _ in
+        .onChange(of: selectedImage) { img in
         //.onChange(of: selectedImage) { // ios 17 up
-            uploadStatus = ""
-            selectedImageErrorMessage = nil
-            uploadingAmount = 0.0
-            self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: URL.str(pickerResult[0])!, mediaType: CSUploadItem.MediaType.image, expiration:expiredHour)]
+            if img != nil {
+                uploadStatus = ""
+                selectedVideoUrl = nil
+                selectedImageErrorMessage = nil
+                uploadingAmount = 0.0
+                self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: URL.str(pickerResult[0])!, mediaType: CSUploadItem.MediaType.image, expiration:expiredHour)]
+            }
         }
         .onChange(of: selectedVideoUrl) { url in
         //.onChange(of: selectedVideoUrl) { _, url in // ios 17 up
-            uploadStatus = ""
-            selectedImageErrorMessage = nil
-            uploadingAmount = 0.0
-            if let url = url {
-                self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: url, mediaType: CSUploadItem.MediaType.video, expiration:expiredHour)]
+            if url != nil {
+                uploadStatus = ""
+                selectedImage = nil
+                selectedImageErrorMessage = nil
+                uploadingAmount = 0.0
+                if let url = url {
+                    self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: url, mediaType: CSUploadItem.MediaType.video, expiration:expiredHour)]
+                }
             }
         }
     }
