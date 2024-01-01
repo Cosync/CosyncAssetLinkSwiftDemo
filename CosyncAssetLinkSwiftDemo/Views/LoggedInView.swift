@@ -32,13 +32,13 @@ struct LoggedInView: View {
         TabView (selection: $selectedTab){
 
             UploadView().tabItem {
-                Image(systemName: "arrow.right.square").renderingMode(.template)
+                Image(systemName: "square.and.arrow.up").renderingMode(.template)
                     .foregroundColor(Color(.brown))
                 Text("Upload")
             }.tag("upload")
             
             AssetView().tabItem {
-                Image(systemName: "person.badge.plus").renderingMode(.template)
+                Image(systemName: "photo.circle").renderingMode(.template)
                     .foregroundColor(Color(.brown))
                 Text("Asset")
             }.tag("asset")

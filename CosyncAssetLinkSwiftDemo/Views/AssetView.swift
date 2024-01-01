@@ -41,7 +41,9 @@ struct AssetView: View {
             }
        
             List(assetList, id: \._id) { asset in
-               AssetRow(asset: asset) 
+                if (asset.contentType != nil) {
+                    AssetRow(asset: asset)
+                }
             }
         }
     }
