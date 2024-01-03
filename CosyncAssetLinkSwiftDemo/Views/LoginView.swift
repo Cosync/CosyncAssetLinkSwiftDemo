@@ -26,8 +26,8 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject var appState: AppState
-    @State private var email = "tolacambo@gmail.com"
-    @State private var password = "qwerty"
+    @State private var email = ""
+    @State private var password = ""
     
     
     var body: some View {
