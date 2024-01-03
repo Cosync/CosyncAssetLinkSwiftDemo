@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Cosync/CosyncAssetLinkSwift.git",
       "state" : {
-        "revision" : "05f7eaca4c9aa7163d7709766337a8937c050171",
-        "version" : "1.0.4"
+        "revision" : "fbea1be82c3bcf7f07a88ee69ab527d8ef43ad09",
+        "version" : "1.0.5"
       }
     },
     {

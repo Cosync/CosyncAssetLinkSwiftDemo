@@ -40,10 +40,12 @@ struct AssetView: View {
                 Text("There is no Cosync Asset")
             }
        
-            List(assetList, id: \._id) { asset in
-                if (asset.contentType != nil) {
+            ScrollView() {
+                
+                ForEach(assetList, id: \._id.stringValue) { asset in
                     AssetRow(asset: asset)
                 }
+                 
             }
         }
     }

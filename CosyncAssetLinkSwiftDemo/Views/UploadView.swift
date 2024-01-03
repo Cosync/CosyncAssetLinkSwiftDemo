@@ -27,6 +27,28 @@ import CosyncAssetLinkSwift
 import RealmSwift
 import AVKit
 import Photos
+
+struct SelectedAsset {
+    
+    enum MediaType {
+        case image, video, audio, unknown
+    }
+    
+    var id:String
+    var url:URL
+    var type: MediaType = .unknown
+    
+    var csUploadType: CSUploadItem.MediaType {
+        switch type {
+        case .image: return .image
+        case .video: return .video
+        case .audio: return .audio
+        case .unknown: return .unknown
+        }
+    }
+   
+    
+}
  
 struct UploadView: View {
     @State private var expiredHour: Double = 0.0
@@ -41,9 +63,19 @@ struct UploadView: View {
     @State private var selectedVideoUrl:URL?
     @State private var selectedImage: UIImage?
     var uploadManager = CSUploadManager.shared
-    @State private var uploads: [CSUploadItem]  = []
+    @State private var selectedAsset: SelectedAsset?
+    @State private var expirationHour:String = ""
+    @State private var caption:String = ""
     
-   
+    var uploads: [CSUploadItem] {
+        var items: [CSUploadItem] = []
+        if selectedAsset != nil {
+            items.append(CSUploadItem(tag: selectedAsset!.id, url: selectedAsset!.url, mediaType: selectedAsset!.csUploadType, expiration: expiredHour, caption: caption))
+        }
+        return items
+    }
+    
+    
     var body: some View {
         VStack{
             ZStack{
@@ -70,9 +102,9 @@ struct UploadView: View {
                         .shadow(radius: 10)
                         .cornerRadius(10)
                 }
-                
-                
             }
+            
+            
             
             Button(action: {
                 preferredType = ""
@@ -86,6 +118,27 @@ struct UploadView: View {
                
             })
             
+            TextField(
+                "Caption",
+                text: $caption
+            ) 
+            .textFieldStyle(.roundedBorder)
+            .padding(.top, 20)
+            
+            TextField(
+                "Expiration Hour",
+                text: $expirationHour
+            )
+            .onChange(of: expirationHour) { _ in
+                expiredHour = Double(expirationHour) ?? 0.0
+                
+            }
+            .keyboardType(.numberPad)
+            .textFieldStyle(.roundedBorder)
+            .padding(.top, 20)
+            
+            Divider()
+            
             
             if selectedImageErrorMessage != nil {
                 Text("\(selectedImageErrorMessage ?? "")").foregroundColor(.red)
@@ -98,17 +151,20 @@ struct UploadView: View {
                 ProgressView(("Uploading \( (uploadingAmount/1) * 100, specifier: "%.0f")%") , value: uploadingAmount, total: 1)
             }
             
-            Button(action: {
-                uploadPhoto()
+            if let picked = selectedAsset {
                 
-            }, label: {
-                Text("Upload")
-                    .font(.system(size: 24, weight: .bold, design: .default))
-                    .frame(maxWidth: .infinity, maxHeight: 60)
-                    .foregroundColor(Color.white)
-                    .background(Color.blue)
-                    .cornerRadius(10)
-            }) 
+                Button(action: {
+                    uploadPhoto()
+                    
+                }, label: {
+                    Text("Upload")
+                        .font(.system(size: 24, weight: .bold, design: .default))
+                        .frame(maxWidth: .infinity, maxHeight: 60)
+                        .foregroundColor(Color.white)
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                })
+            }
             
         }
         .padding()
@@ -122,7 +178,8 @@ struct UploadView: View {
                 selectedVideoUrl = nil
                 selectedImageErrorMessage = nil
                 uploadingAmount = 0.0
-                self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: URL.str(pickerResult[0])!, mediaType: CSUploadItem.MediaType.image, expiration:expiredHour)]
+                
+                self.selectedAsset = SelectedAsset(id: ObjectId.generate().stringValue, url: URL.str(pickerResult[0])!, type: .image)
             }
         }
         .onChange(of: selectedVideoUrl) { url in
@@ -133,7 +190,7 @@ struct UploadView: View {
                 selectedImageErrorMessage = nil
                 uploadingAmount = 0.0
                 if let url = url {
-                    self.uploads = [CSUploadItem(tag: ObjectId.generate().stringValue, url: url, mediaType: CSUploadItem.MediaType.video, expiration:expiredHour)]
+                    self.selectedAsset = SelectedAsset(id: ObjectId.generate().stringValue, url: url, type: .video)
                 }
             }
         }
@@ -141,7 +198,7 @@ struct UploadView: View {
     
     
     @MainActor private func uploadPhoto(){
-        if uploads.count == 0 || isUploading {
+        if selectedAsset == nil || isUploading {
             ToastManager.shared.send(title:"Upload Error", message: "Please choose an image.")
             return
         }
@@ -149,6 +206,7 @@ struct UploadView: View {
         do {
             uploadingAmount = 0.0
             isUploading = true
+            
             try uploadManager.uploadAssets(uploadItems: uploads) { (state: CSUploadState) in
                 onUpload(state)
             }
@@ -231,6 +289,9 @@ struct UploadView: View {
         case .assetPogress( let bytes , let bytesTotal , _):
             let percentage = CGFloat(bytes) / CGFloat(bytesTotal)
             uploadingAmount = percentage
+            if uploadingAmount == 1 {
+                uploadStatus = "Asset is being created"
+            }
             break
             
         case .assetUploadError(_, _):
@@ -244,7 +305,7 @@ struct UploadView: View {
         case .transactionEnd(_, _):
             uploadStatus = "Your asset has been uploaded."
             isUploading = false
-            self.uploads = []
+            self.selectedAsset = nil
             break
         }
     }
