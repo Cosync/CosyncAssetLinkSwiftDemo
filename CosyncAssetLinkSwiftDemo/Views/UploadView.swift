@@ -51,6 +51,13 @@ struct SelectedAsset {
 }
  
 struct UploadView: View {
+    
+    enum Field {
+       case caption
+       case expiredHour
+    }
+    
+    
     @State private var expiredHour: Double = 0.0
     @State private var showPicker: Bool = false
     @State private var pickerResult: [String] = []
@@ -66,6 +73,7 @@ struct UploadView: View {
     @State private var selectedAsset: SelectedAsset?
     @State private var expirationHour:String = ""
     @State private var caption:String = ""
+    @FocusState private var focusedField: Field?
     
     var uploads: [CSUploadItem] {
         var items: [CSUploadItem] = []
@@ -76,6 +84,7 @@ struct UploadView: View {
     }
     
     
+   
     var body: some View {
         VStack{
             ZStack{
@@ -124,6 +133,8 @@ struct UploadView: View {
             ) 
             .textFieldStyle(.roundedBorder)
             .padding(.top, 20)
+            .focused($focusedField, equals: .caption)
+            .submitLabel(.next)
             
             TextField(
                 "Expiration Hour",
@@ -131,13 +142,11 @@ struct UploadView: View {
             )
             .onChange(of: expirationHour) { _ in
                 expiredHour = Double(expirationHour) ?? 0.0
-                
             }
-            .keyboardType(.numberPad)
+            .keyboardType(.decimalPad)
             .textFieldStyle(.roundedBorder)
-            .padding(.top, 20)
-            
-            Divider()
+            .focused($focusedField, equals: .expiredHour)
+            .padding(.top, 20) 
             
             
             if selectedImageErrorMessage != nil {
@@ -151,7 +160,7 @@ struct UploadView: View {
                 ProgressView(("Uploading \( (uploadingAmount/1) * 100, specifier: "%.0f")%") , value: uploadingAmount, total: 1)
             }
             
-            if let picked = selectedAsset {
+            if let _ = selectedAsset {
                 
                 Button(action: {
                     uploadPhoto()
@@ -193,6 +202,31 @@ struct UploadView: View {
                     self.selectedAsset = SelectedAsset(id: ObjectId.generate().stringValue, url: url, type: .video)
                 }
             }
+        }
+        .onSubmit {
+           switch focusedField {
+           case .caption:
+               focusedField = .expiredHour
+           case .expiredHour:
+               hideKeyboard()
+           case .none: break
+               
+           }
+       }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+               
+                    Spacer()
+                    Button {
+                        hideKeyboard()
+                    } label: {
+                        Image(systemName: "keyboard.chevron.compact.down")
+                    }
+                
+            }
+        }
+        .onAppear{
+            focusedField = .caption
         }
     }
     
@@ -315,3 +349,12 @@ struct UploadView: View {
 #Preview {
     UploadView()
 }
+
+
+#if canImport(UIKit)
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+#endif
