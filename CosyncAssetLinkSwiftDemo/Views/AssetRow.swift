@@ -35,11 +35,12 @@ struct AssetRow: View {
     @State private var contentType = ""
     @State private var isPlaying = false
     @State private var player:AVPlayer?
+    @State private var urlMedium:String = ""
     
     var body: some View {
         VStack{
             
-            if let urlMedium = asset.urlMedium {
+            if urlMedium != "" {
                 HStack{
                     
                     if contentType.contains("image") {
@@ -54,8 +55,13 @@ struct AssetRow: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
                             case .failure:
-                                Text("Invalid URL. Reloading asset...")
-                                    .foregroundColor(.red)
+                                Button(action: {
+                                    refreshAsset()
+                                }, label: {
+                                    Text("Invalid URL. Reload asset")
+                                        .foregroundColor(.red)
+                                })
+                               
                                 
                                 
                             @unknown default:
@@ -124,10 +130,12 @@ struct AssetRow: View {
         .padding()
         .onAppear{
             self.contentType = asset.contentType ?? ""
-            
-           
-            
             checkExpiredDate()
+            urlMedium = asset.urlMedium ?? ""
+        }
+        .onChange(of: asset) { _ in
+            print(asset.urlMedium ?? "")
+            urlMedium = asset.urlMedium ?? ""
         }
     }
     
@@ -135,7 +143,7 @@ struct AssetRow: View {
     var loadVideoView : some View {
         ZStack{
             
-            AsyncImage(url: URL(string: asset.urlMedium!), transaction: .init(animation: .spring(response: 1.6))) { phase in
+            AsyncImage(url: URL(string: urlMedium), transaction: .init(animation: .spring(response: 1.6))) { phase in
                 switch phase {
                 case .empty:
                     ProgressView()
@@ -145,10 +153,15 @@ struct AssetRow: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                 case .failure:
-                    Text("Invalid URL. Reloading asset...")
-                        .foregroundColor(.red)
                     
-                    
+                    Button(action: {
+                        refreshAsset()
+                    }, label: {
+                        Text("Invalid URL. Reload asset")
+                            .foregroundColor(.red)
+                    })
+                         
+                     
                 @unknown default:
                     Text("Unknown error. Please try again.")
                         .foregroundColor(.red)
@@ -194,6 +207,8 @@ struct AssetRow: View {
             }
             
         }.onAppear{
+           
+            checkExpiredDate()
             player = AVPlayer(url: URL(string: asset.url!)!)
         }
          
@@ -224,25 +239,26 @@ struct AssetRow: View {
         }
     }
     
-    private func checkExpiredDate(){
+    private func refreshAsset() {
+        Task{
+            if let _ = RM.user {
+                 let _ = try await CSAssetManager.shared.refreshAsset(assetId: asset._id.stringValue)
+                
+            }
+             
+        }
+    }
+    
+    private func checkExpiredDate() {
         
         if let expiration = asset.expiration {
-            
-            print("\(expiration)")
-            
             let now = Date.now
             if now.compare(expiration) == .orderedDescending {
-                Task{
-                   
-                    if let _ = try await CSAssetManager.shared.refreshAsset(assetId: asset._id.stringValue){
-                      
-                    }
-                     
-                }
+                refreshAsset()
             }
-            
         }
-        
     }
+    
+    
 }
  

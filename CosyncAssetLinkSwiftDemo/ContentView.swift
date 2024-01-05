@@ -62,6 +62,7 @@ struct ContentView: View {
             
             Spacer()
         } 
+        .ignoresSafeArea(.all)
         .environmentObject(appState)
         .padding()
     }

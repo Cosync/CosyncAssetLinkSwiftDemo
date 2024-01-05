@@ -29,20 +29,24 @@ struct LoggedInView: View {
     @State private var selectedTab = "upload"
     
     var body: some View {
-        TabView (selection: $selectedTab){
-
-            UploadView().tabItem {
-                Image(systemName: "square.and.arrow.up").renderingMode(.template)
-                    .foregroundColor(Color(.brown))
-                Text("Upload")
-            }.tag("upload")
-            
-            AssetView().tabItem {
-                Image(systemName: "photo.circle").renderingMode(.template)
-                    .foregroundColor(Color(.brown))
-                Text("Asset")
-            }.tag("asset")
+        NavigationView {
+            TabView (selection: $selectedTab){
+                
+                UploadView().tabItem {
+                    Image(systemName: "square.and.arrow.up").renderingMode(.template)
+                        .foregroundColor(Color(.brown))
+                    Text("Upload")
+                }.tag("upload")
+                
+                AssetView().tabItem {
+                    Image(systemName: "photo.circle").renderingMode(.template)
+                        .foregroundColor(Color(.brown))
+                    Text("Asset")
+                }.tag("asset")
+            }
         }
+        .navigationBarBackButtonHidden()
+        .edgesIgnoringSafeArea(.all)
     }
 }
 

@@ -117,11 +117,17 @@ class RealmManager {
                 }
             })
             
+            print("initRealm user id \(self.app.currentUser?.id)")
+            
             CSUploadManager.shared.configure(app: self.app, realm: self.realm!)
             CSAssetManager.shared.configure(app: self.app, realm: self.realm!)
         }
         catch {
+            
             print("Unable to intialize realm and subscriptions \(error)")
+            
+            throw(error)
+           
         }
         
     } 
