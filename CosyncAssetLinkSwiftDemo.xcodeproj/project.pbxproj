@@ -346,7 +346,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CosyncAssetLinkSwiftDemo/Preview Content\"";
-				DEVELOPMENT_TEAM = WQQLK89MX8;
+				DEVELOPMENT_TEAM = Y253USGTD2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CosyncAssetLinkSwiftDemo/Info.plist;
@@ -361,7 +361,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.cosync.cosyncassetlinkswiftdemo.CosyncAssetLinkSwiftDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.skinux.CosyncAssetLinkSwiftDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -377,7 +377,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CosyncAssetLinkSwiftDemo/Preview Content\"";
-				DEVELOPMENT_TEAM = WQQLK89MX8;
+				DEVELOPMENT_TEAM = Y253USGTD2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CosyncAssetLinkSwiftDemo/Info.plist;
@@ -392,7 +392,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.cosync.cosyncassetlinkswiftdemo.CosyncAssetLinkSwiftDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.skinux.CosyncAssetLinkSwiftDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -429,7 +429,7 @@
 			repositoryURL = "https://github.com/Cosync/CosyncAssetLinkSwift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.5;
+				minimumVersion = 1.0.6;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

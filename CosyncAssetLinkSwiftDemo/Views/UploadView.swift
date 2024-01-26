@@ -178,7 +178,16 @@ struct UploadView: View {
         }
         .padding()
         .fullScreenCover(isPresented: $showPicker, onDismiss: {showPicker = false}) {
-            AssetPicker(pickerResult: self.$pickerResult, selectedImage: self.$selectedImage ,selectedVideoUrl: self.$selectedVideoUrl, selectedType: self.$selectedType, isPresented: self.$showPicker, errorMessage: self.$selectedImageErrorMessage, preferredType : self.preferredType, isMultipleSelection: false)
+            AssetPicker(isPresented: self.$showPicker, preferredType: "image", isMultipleSelection: false) { result in
+                
+                if (result.success) {
+                    pickerResult.append(result.assetId)
+                    selectedImage = result.data as? UIImage
+                }
+                else {
+                    selectedImageErrorMessage = result.error
+                }
+            }
         }
         .onChange(of: selectedImage) { img in
         //.onChange(of: selectedImage) { // ios 17 up
